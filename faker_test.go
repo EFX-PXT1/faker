@@ -535,7 +535,7 @@ func validateRange(value int) error {
 
 func TestSetDataWithTagIfFirstArgumentNotPtr(t *testing.T) {
 	temp := struct{}{}
-	if setDataWithTag(reflect.ValueOf(temp), "").Error() != "Not a pointer value" {
+	if setDataWithTag(reflect.ValueOf(temp), "", nil).Error() != "Not a pointer value" {
 		t.Error("Expected in arguments not ptr")
 	}
 }

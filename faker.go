@@ -365,7 +365,7 @@ func getValue(a interface{}) (reflect.Value, error) {
 						return reflect.Value{}, err
 					}
 					if zero {
-						err := setDataWithTag(v.Field(i).Addr(), tags.fieldType)
+						err := setDataWithTag(v.Field(i).Addr(), tags.fieldType, tags.sf)
 						if err != nil {
 							return reflect.Value{}, err
 						}
@@ -382,7 +382,7 @@ func getValue(a interface{}) (reflect.Value, error) {
 				case tags.fieldType == SKIP:
 					continue
 				default:
-					err := setDataWithTag(v.Field(i).Addr(), tags.fieldType)
+					err := setDataWithTag(v.Field(i).Addr(), tags.fieldType, tags.sf)
 					if err != nil {
 						return reflect.Value{}, err
 					}
@@ -481,7 +481,7 @@ func isZero(field reflect.Value) (bool, error) {
 
 func decodeTags(typ reflect.Type, i int) structTag {
 	tags := strings.Split(typ.Field(i).Tag.Get(tagName), ",")
-
+	sf := typ.Field(i)
 	keepOriginal := false
 	res := make([]string, 0)
 	for _, tag := range tags {
@@ -495,15 +495,17 @@ func decodeTags(typ reflect.Type, i int) structTag {
 	return structTag{
 		fieldType:    strings.Join(res, ","),
 		keepOriginal: keepOriginal,
+		sf:           &sf,
 	}
 }
 
 type structTag struct {
 	fieldType    string
 	keepOriginal bool
+	sf           *reflect.StructField
 }
 
-func setDataWithTag(v reflect.Value, tag string) error {
+func setDataWithTag(v reflect.Value, tag string, sf *reflect.StructField) error {
 
 	if v.Kind() != reflect.Ptr {
 		return errors.New(ErrValueNotPtr)
@@ -534,7 +536,7 @@ func setDataWithTag(v reflect.Value, tag string) error {
 		v.Set(newv)
 		return nil
 	case reflect.String:
-		return userDefinedString(v, tag)
+		return userDefinedString(v, tag, sf)
 	case reflect.Int, reflect.Int32, reflect.Int64, reflect.Int8, reflect.Int16, reflect.Uint, reflect.Uint8,
 		reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
 		return userDefinedNumber(v, tag)
@@ -615,12 +617,12 @@ func userDefinedArray(v reflect.Value, tag string) error {
 	return nil
 }
 
-func userDefinedString(v reflect.Value, tag string) error {
+func userDefinedString(v reflect.Value, tag string, sf *reflect.StructField) error {
 	var res interface{}
 	var err error
 
 	if tagFunc, ok := mapperTag[tag]; ok {
-		res, err = tagFunc(v, nil)
+		res, err = tagFunc(v, sf)
 		if err != nil {
 			return err
 		}
