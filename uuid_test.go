@@ -9,7 +9,7 @@ import (
 
 func TestDigit(t *testing.T) {
 	p := GetIdentifier()
-	uuid, err := p.Digit(reflect.Value{})
+	uuid, err := p.Digit(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -20,7 +20,7 @@ func TestDigit(t *testing.T) {
 
 func TestHyphenated(t *testing.T) {
 	p := GetIdentifier()
-	uuid, err := p.Hyphenated(reflect.Value{})
+	uuid, err := p.Hyphenated(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}

@@ -49,8 +49,8 @@ func SetPayment(p Render) {
 
 // Render contains Whole Random Credit Card Generators with their types
 type Render interface {
-	CreditCardType(v reflect.Value) (interface{}, error)
-	CreditCardNumber(v reflect.Value) (interface{}, error)
+	CreditCardType(v reflect.Value, ctx *Context) (interface{}, error)
+	CreditCardNumber(v reflect.Value, ctx *Context) (interface{}, error)
 }
 
 // Payment struct
@@ -72,7 +72,7 @@ func (p Payment) cctype() string {
 
 // CreditCardType returns one of the following credit values:
 // VISA, MasterCard, American Express, Discover, JCB and Diners Club
-func (p Payment) CreditCardType(v reflect.Value) (interface{}, error) {
+func (p Payment) CreditCardType(v reflect.Value, ctx *Context) (interface{}, error) {
 	return p.cctype(), nil
 }
 
@@ -96,7 +96,7 @@ func (p Payment) ccnumber() string {
 }
 
 // CreditCardNumber generated credit card number according to the card number rules
-func (p Payment) CreditCardNumber(v reflect.Value) (interface{}, error) {
+func (p Payment) CreditCardNumber(v reflect.Value, ctx *Context) (interface{}, error) {
 	return p.ccnumber(), nil
 }
 
