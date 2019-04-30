@@ -9,7 +9,7 @@ import (
 )
 
 func TestEmail(t *testing.T) {
-	email, err := GetNetworker().Email(reflect.Value{})
+	email, err := GetNetworker().Email(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -19,7 +19,7 @@ func TestEmail(t *testing.T) {
 }
 func TestMacAddress(t *testing.T) {
 	i := Internet{}
-	mc, err := i.MacAddress(reflect.Value{})
+	mc, err := i.MacAddress(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -29,7 +29,7 @@ func TestMacAddress(t *testing.T) {
 	}
 }
 func TestDomainName(t *testing.T) {
-	domain, err := GetNetworker().DomainName(reflect.Value{})
+	domain, err := GetNetworker().DomainName(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -43,7 +43,7 @@ func TestDomainName(t *testing.T) {
 func TestURLOneVerbs(t *testing.T) {
 	urlFormats = []string{
 		"http://www.%s/"}
-	res, err := GetNetworker().URL(reflect.Value{})
+	res, err := GetNetworker().URL(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -54,7 +54,7 @@ func TestURLOneVerbs(t *testing.T) {
 func TestURLTwoVerbs(t *testing.T) {
 	urlFormats = []string{
 		"http://www.%s/%s"}
-	res, err := GetNetworker().URL(reflect.Value{})
+	res, err := GetNetworker().URL(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -63,7 +63,7 @@ func TestURLTwoVerbs(t *testing.T) {
 	}
 }
 func TestUserName(t *testing.T) {
-	usrname, err := GetNetworker().UserName(reflect.Value{})
+	usrname, err := GetNetworker().UserName(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -73,7 +73,7 @@ func TestUserName(t *testing.T) {
 
 }
 func TestIPv4(t *testing.T) {
-	ip, err := GetNetworker().IPv4(reflect.Value{})
+	ip, err := GetNetworker().IPv4(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -82,7 +82,7 @@ func TestIPv4(t *testing.T) {
 	}
 }
 func TestIPv6(t *testing.T) {
-	ip, err := GetNetworker().IPv6(reflect.Value{})
+	ip, err := GetNetworker().IPv6(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -96,7 +96,7 @@ func TestSetNetwork(t *testing.T) {
 }
 
 func TestPassword(t *testing.T) {
-	pass, err := GetNetworker().Password(reflect.Value{})
+	pass, err := GetNetworker().Password(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}

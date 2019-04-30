@@ -14,7 +14,7 @@ func TestDataFaker(t *testing.T) {
 }
 
 func TestWord(t *testing.T) {
-	word, err := GetLorem().Word(reflect.Value{})
+	word, err := GetLorem().Word(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -24,7 +24,7 @@ func TestWord(t *testing.T) {
 }
 
 func TestSentence(t *testing.T) {
-	res, err := GetLorem().Sentence(reflect.Value{})
+	res, err := GetLorem().Sentence(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}
@@ -35,7 +35,7 @@ func TestSentence(t *testing.T) {
 }
 
 func TestParagraph(t *testing.T) {
-	res, err := GetLorem().Paragraph(reflect.Value{})
+	res, err := GetLorem().Paragraph(reflect.Value{}, nil)
 	if err != nil {
 		t.Error("Expected  not error, got err", err)
 	}

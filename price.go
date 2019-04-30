@@ -33,9 +33,9 @@ var currencies = []string{
 
 // Money provides an interface to generate a custom price with or without a random currency code
 type Money interface {
-	Currency(v reflect.Value) (interface{}, error)
-	Amount(v reflect.Value) (interface{}, error)
-	AmountWithCurrency(v reflect.Value) (interface{}, error)
+	Currency(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	Amount(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	AmountWithCurrency(v reflect.Value, sf *reflect.StructField) (interface{}, error)
 }
 
 // Price struct
@@ -65,7 +65,7 @@ func (p Price) currency() string {
 }
 
 // Currency returns a random currency from currencies
-func (p Price) Currency(v reflect.Value) (interface{}, error) {
+func (p Price) Currency(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return p.currency(), nil
 }
 
@@ -81,7 +81,7 @@ func (p Price) amount() float64 {
 
 // Amount returns a random floating price amount
 // with a random precision of [1,2] up to (10**8 - 1)
-func (p Price) Amount(v reflect.Value) (interface{}, error) {
+func (p Price) Amount(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	kind := v.Kind()
 	val := p.amount()
 	if kind == reflect.Float32 {
@@ -98,7 +98,7 @@ func (p Price) amountwithcurrency() string {
 }
 
 // AmountWithCurrency combines both price and currency together
-func (p Price) AmountWithCurrency(v reflect.Value) (interface{}, error) {
+func (p Price) AmountWithCurrency(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return p.amountwithcurrency(), nil
 }
 

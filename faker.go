@@ -135,7 +135,7 @@ var defaultTag = map[string]string{
 
 // TaggedFunction used as the standard layout function for tag providers in struct.
 // This type also can be used for custom provider.
-type TaggedFunction func(v reflect.Value) (interface{}, error)
+type TaggedFunction func(v reflect.Value, sf *reflect.StructField) (interface{}, error)
 
 var mapperTag = map[string]TaggedFunction{
 	EmailTag:              GetNetworker().Email,
@@ -515,7 +515,7 @@ func setDataWithTag(v reflect.Value, tag string) error {
 			return errors.New(ErrTagNotSupported)
 		}
 		if _, def := defaultTag[tag]; !def {
-			res, err := mapperTag[tag](v)
+			res, err := mapperTag[tag](v, nil)
 			if err != nil {
 				return err
 			}
@@ -525,7 +525,7 @@ func setDataWithTag(v reflect.Value, tag string) error {
 
 		t := v.Type()
 		newv := reflect.New(t.Elem())
-		res, err := mapperTag[tag](newv.Elem())
+		res, err := mapperTag[tag](newv.Elem(), nil)
 		if err != nil {
 			return err
 		}
@@ -546,7 +546,7 @@ func setDataWithTag(v reflect.Value, tag string) error {
 		if _, exist := mapperTag[tag]; !exist {
 			return errors.New(ErrTagNotSupported)
 		}
-		res, err := mapperTag[tag](v)
+		res, err := mapperTag[tag](v, nil)
 		if err != nil {
 			return err
 		}
@@ -620,7 +620,7 @@ func userDefinedString(v reflect.Value, tag string) error {
 	var err error
 
 	if tagFunc, ok := mapperTag[tag]; ok {
-		res, err = tagFunc(v)
+		res, err = tagFunc(v, nil)
 		if err != nil {
 			return err
 		}
@@ -643,7 +643,7 @@ func userDefinedNumber(v reflect.Value, tag string) error {
 	var err error
 
 	if tagFunc, ok := mapperTag[tag]; ok {
-		res, err = tagFunc(v)
+		res, err = tagFunc(v, nil)
 		if err != nil {
 			return err
 		}

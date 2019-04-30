@@ -715,7 +715,7 @@ func TestExtend(t *testing.T) {
 			ID string `faker:"test"`
 		}{}
 
-		err := AddProvider("test", func(v reflect.Value) (interface{}, error) {
+		err := AddProvider("test", func(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 			return "test", nil
 		})
 
@@ -736,7 +736,7 @@ func TestExtend(t *testing.T) {
 
 	t.Run("test-struct", func(t *testing.T) {
 		a := &Student{}
-		err := AddProvider("custom-school", func(v reflect.Value) (interface{}, error) {
+		err := AddProvider("custom-school", func(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 
 			sch := School{
 				Location: "North Kindom",
@@ -765,7 +765,7 @@ func TestExtend(t *testing.T) {
 func TestTagAlreadyExists(t *testing.T) {
 	// This test is to ensure that existing tag cannot be rewritten
 
-	err := AddProvider(EmailTag, func(v reflect.Value) (interface{}, error) {
+	err := AddProvider(EmailTag, func(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 		return nil, nil
 	})
 
@@ -785,7 +785,7 @@ func TestTagWithPointer(t *testing.T) {
 		School     *School  `faker:"school"`
 	}
 	// With custom provider
-	err := AddProvider("school", func(v reflect.Value) (interface{}, error) {
+	err := AddProvider("school", func(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 		return &School{Location: "Jakarta"}, nil
 	})
 	if err != nil {
@@ -822,7 +822,7 @@ func TestTagWithPointer(t *testing.T) {
 
 func TestItOverwritesDefaultValueIfKeepIsSet(t *testing.T) {
 	type TestStruct struct {
-		Email     string `json:"email,omitempty" faker:"email,keep"`
+		Email string `json:"email,omitempty" faker:"email,keep"`
 	}
 
 	test := TestStruct{}
@@ -880,7 +880,7 @@ func TestItThrowsAnErrorWhenKeepIsUsedOnIncomparableType(t *testing.T) {
 	withSlice := TypeStructWithSlice{}
 	withArray := TypeStructWithArray{}
 
-	for _, item := range []interface{}{withArray,withStruct,withMap,withSlice} {
+	for _, item := range []interface{}{withArray, withStruct, withMap, withSlice} {
 		err := FakeData(&item)
 		if err == nil {
 			t.Errorf("expected error, but got nil")

@@ -50,9 +50,9 @@ var wordList = []string{
 
 // DataFaker generates randomized Words, Sentences and Paragraphs
 type DataFaker interface {
-	Word(v reflect.Value) (interface{}, error)
-	Sentence(v reflect.Value) (interface{}, error)
-	Paragraph(v reflect.Value) (interface{}, error)
+	Word(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	Sentence(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	Paragraph(v reflect.Value, sf *reflect.StructField) (interface{}, error)
 }
 
 // SetDataFaker sets Custom data in lorem
@@ -80,7 +80,7 @@ func (l Lorem) word() string {
 }
 
 // Word returns a word from the wordList const
-func (l Lorem) Word(v reflect.Value) (interface{}, error) {
+func (l Lorem) Word(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return l.word(), nil
 }
 
@@ -108,7 +108,7 @@ func (l Lorem) sentence() string {
 }
 
 // Sentence returns a sentence using the wordList const
-func (l Lorem) Sentence(v reflect.Value) (interface{}, error) {
+func (l Lorem) Sentence(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	sentence := l.sentence()
 	return sentence, nil
 }
@@ -132,7 +132,7 @@ func (l Lorem) paragraph() string {
 }
 
 // Paragraph returns a series of sentences as a paragraph using the wordList const
-func (l Lorem) Paragraph(v reflect.Value) (interface{}, error) {
+func (l Lorem) Paragraph(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return l.paragraph(), nil
 }
 

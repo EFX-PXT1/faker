@@ -8,13 +8,13 @@ import (
 
 // Dowser provides interfaces to generate random logical Names with their initials
 type Dowser interface {
-	TitleMale(v reflect.Value) (interface{}, error)
-	TitleFeMale(v reflect.Value) (interface{}, error)
-	FirstName(v reflect.Value) (interface{}, error)
-	FirstNameMale(v reflect.Value) (interface{}, error)
-	FirstNameFemale(v reflect.Value) (interface{}, error)
-	LastName(v reflect.Value) (interface{}, error)
-	Name(v reflect.Value) (interface{}, error)
+	TitleMale(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	TitleFeMale(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	FirstName(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	FirstNameMale(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	FirstNameFemale(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	LastName(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	Name(v reflect.Value, sf *reflect.StructField) (interface{}, error)
 }
 
 var person Dowser
@@ -133,7 +133,7 @@ func (p Person) titlemale() string {
 }
 
 // TitleMale generates random titles for males
-func (p Person) TitleMale(v reflect.Value) (interface{}, error) {
+func (p Person) TitleMale(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return p.titlemale(), nil
 }
 
@@ -148,7 +148,7 @@ func (p Person) titleFemale() string {
 }
 
 // TitleFeMale generates random titles for females
-func (p Person) TitleFeMale(v reflect.Value) (interface{}, error) {
+func (p Person) TitleFeMale(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return p.titleFemale(), nil
 }
 
@@ -163,7 +163,7 @@ func (p Person) firstname() string {
 }
 
 // FirstName retuns first names
-func (p Person) FirstName(v reflect.Value) (interface{}, error) {
+func (p Person) FirstName(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return p.firstname(), nil
 }
 
@@ -178,7 +178,7 @@ func (p Person) firstnamemale() string {
 }
 
 // FirstNameMale retuns first names for males
-func (p Person) FirstNameMale(v reflect.Value) (interface{}, error) {
+func (p Person) FirstNameMale(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return p.firstnamemale(), nil
 }
 
@@ -193,7 +193,7 @@ func (p Person) firstnamefemale() string {
 }
 
 // FirstNameFemale retuns first names for females
-func (p Person) FirstNameFemale(v reflect.Value) (interface{}, error) {
+func (p Person) FirstNameFemale(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return p.firstnamefemale(), nil
 }
 
@@ -208,7 +208,7 @@ func (p Person) lastname() string {
 }
 
 // LastName returns last name
-func (p Person) LastName(v reflect.Value) (interface{}, error) {
+func (p Person) LastName(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return p.lastname(), nil
 }
 
@@ -226,7 +226,7 @@ func (p Person) name() string {
 }
 
 // Name returns a random name
-func (p Person) Name(v reflect.Value) (interface{}, error) {
+func (p Person) Name(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
 	return p.name(), nil
 }
 
