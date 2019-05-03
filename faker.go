@@ -137,8 +137,9 @@ var defaultTag = map[string]string{
 
 // Context is supplied to TaggedFunction to extend the scope of context information
 type Context struct {
-	Uuid string
-	Sf   *reflect.StructField
+	Uuid    string
+	Sf      *reflect.StructField
+	Storage interface{}
 }
 
 // TaggedFunction used as the standard layout function for tag providers in struct.
@@ -265,7 +266,7 @@ func FakeData(a interface{}) error {
 
 	rval := reflect.ValueOf(a)
 
-	finalValue, err := getValue(a, &Context{uuid.Must(uuid.NewV4()).String(), nil})
+	finalValue, err := getValue(a, &Context{uuid.Must(uuid.NewV4()).String(), nil, nil})
 	if err != nil {
 		return err
 	}
@@ -335,7 +336,7 @@ func getValue(a interface{}, ctx *Context) (reflect.Value, error) {
 	k := t.Kind()
 
 	if ctx == nil {
-		ctx = &Context{uuid.Must(uuid.NewV4()).String(), nil}
+		ctx = &Context{uuid.Must(uuid.NewV4()).String(), nil, nil}
 	}
 
 	switch k {
