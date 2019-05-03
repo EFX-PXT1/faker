@@ -11,6 +11,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 var (
@@ -133,9 +135,15 @@ var defaultTag = map[string]string{
 	HyphenatedID:          HyphenatedID,
 }
 
+// Context is supplied to TaggedFunction to extend the scope of context information
+type Context struct {
+	Uuid string
+	Sf   *reflect.StructField
+}
+
 // TaggedFunction used as the standard layout function for tag providers in struct.
 // This type also can be used for custom provider.
-type TaggedFunction func(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+type TaggedFunction func(v reflect.Value, ctx *Context) (interface{}, error)
 
 var mapperTag = map[string]TaggedFunction{
 	EmailTag:              GetNetworker().Email,
@@ -257,7 +265,7 @@ func FakeData(a interface{}) error {
 
 	rval := reflect.ValueOf(a)
 
-	finalValue, err := getValue(a)
+	finalValue, err := getValue(a, &Context{uuid.Must(uuid.NewV4()).String(), nil})
 	if err != nil {
 		return err
 	}
@@ -319,12 +327,16 @@ func AddProvider(tag string, provider TaggedFunction) error {
 	return nil
 }
 
-func getValue(a interface{}) (reflect.Value, error) {
+func getValue(a interface{}, ctx *Context) (reflect.Value, error) {
 	t := reflect.TypeOf(a)
 	if t == nil {
 		return reflect.Value{}, fmt.Errorf("interface{} not allowed")
 	}
 	k := t.Kind()
+
+	if ctx == nil {
+		ctx = &Context{uuid.Must(uuid.NewV4()).String(), nil}
+	}
 
 	switch k {
 	case reflect.Ptr:
@@ -332,12 +344,12 @@ func getValue(a interface{}) (reflect.Value, error) {
 		var val reflect.Value
 		var err error
 		if a != reflect.Zero(reflect.TypeOf(a)).Interface() {
-			val, err = getValue(reflect.ValueOf(a).Elem().Interface())
+			val, err = getValue(reflect.ValueOf(a).Elem().Interface(), ctx)
 			if err != nil {
 				return reflect.Value{}, err
 			}
 		} else {
-			val, err = getValue(v.Elem().Interface())
+			val, err = getValue(v.Elem().Interface(), ctx)
 			if err != nil {
 				return reflect.Value{}, err
 			}
@@ -365,7 +377,8 @@ func getValue(a interface{}) (reflect.Value, error) {
 						return reflect.Value{}, err
 					}
 					if zero {
-						err := setDataWithTag(v.Field(i).Addr(), tags.fieldType, tags.sf)
+						ctx.Sf = tags.sf
+						err := setDataWithTag(v.Field(i).Addr(), tags.fieldType, ctx)
 						if err != nil {
 							return reflect.Value{}, err
 						}
@@ -373,7 +386,7 @@ func getValue(a interface{}) (reflect.Value, error) {
 					}
 					v.Field(i).Set(reflect.ValueOf(a).Field(i))
 				case tags.fieldType == "":
-					val, err := getValue(v.Field(i).Interface())
+					val, err := getValue(v.Field(i).Interface(), ctx)
 					if err != nil {
 						return reflect.Value{}, err
 					}
@@ -382,7 +395,8 @@ func getValue(a interface{}) (reflect.Value, error) {
 				case tags.fieldType == SKIP:
 					continue
 				default:
-					err := setDataWithTag(v.Field(i).Addr(), tags.fieldType, tags.sf)
+					ctx.Sf = tags.sf
+					err := setDataWithTag(v.Field(i).Addr(), tags.fieldType, ctx)
 					if err != nil {
 						return reflect.Value{}, err
 					}
@@ -402,7 +416,7 @@ func getValue(a interface{}) (reflect.Value, error) {
 		}
 		v := reflect.MakeSlice(t, len, len)
 		for i := 0; i < v.Len(); i++ {
-			val, err := getValue(v.Index(i).Interface())
+			val, err := getValue(v.Index(i).Interface(), ctx)
 			if err != nil {
 				return reflect.Value{}, err
 			}
@@ -450,13 +464,13 @@ func getValue(a interface{}) (reflect.Value, error) {
 		v := reflect.MakeMap(t)
 		for i := 0; i < len; i++ {
 			keyInstance := reflect.New(t.Key()).Elem().Interface()
-			key, err := getValue(keyInstance)
+			key, err := getValue(keyInstance, ctx)
 			if err != nil {
 				return reflect.Value{}, err
 			}
 
 			valueInstance := reflect.New(t.Elem()).Elem().Interface()
-			val, err := getValue(valueInstance)
+			val, err := getValue(valueInstance, ctx)
 			if err != nil {
 				return reflect.Value{}, err
 			}
@@ -505,7 +519,7 @@ type structTag struct {
 	sf           *reflect.StructField
 }
 
-func setDataWithTag(v reflect.Value, tag string, sf *reflect.StructField) error {
+func setDataWithTag(v reflect.Value, tag string, ctx *Context) error {
 
 	if v.Kind() != reflect.Ptr {
 		return errors.New(ErrValueNotPtr)
@@ -536,7 +550,7 @@ func setDataWithTag(v reflect.Value, tag string, sf *reflect.StructField) error 
 		v.Set(newv)
 		return nil
 	case reflect.String:
-		return userDefinedString(v, tag, sf)
+		return userDefinedString(v, tag, ctx)
 	case reflect.Int, reflect.Int32, reflect.Int64, reflect.Int8, reflect.Int16, reflect.Uint, reflect.Uint8,
 		reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Float32, reflect.Float64:
 		return userDefinedNumber(v, tag)
@@ -617,12 +631,12 @@ func userDefinedArray(v reflect.Value, tag string) error {
 	return nil
 }
 
-func userDefinedString(v reflect.Value, tag string, sf *reflect.StructField) error {
+func userDefinedString(v reflect.Value, tag string, ctx *Context) error {
 	var res interface{}
 	var err error
 
 	if tagFunc, ok := mapperTag[tag]; ok {
-		res, err = tagFunc(v, sf)
+		res, err = tagFunc(v, ctx)
 		if err != nil {
 			return err
 		}

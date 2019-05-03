@@ -22,8 +22,8 @@ func GetIdentifier() Identifier {
 
 // Identifier ...
 type Identifier interface {
-	Digit(v reflect.Value, sf *reflect.StructField) (interface{}, error)
-	Hyphenated(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	Digit(v reflect.Value, ctx *Context) (interface{}, error)
+	Hyphenated(v reflect.Value, ctx *Context) (interface{}, error)
 }
 
 // UUID struct
@@ -53,7 +53,7 @@ func (u UUID) hyphenated() (string, error) {
 }
 
 // Hyphenated returns a 36 byte hyphenated UUID
-func (u UUID) Hyphenated(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
+func (u UUID) Hyphenated(v reflect.Value, ctx *Context) (interface{}, error) {
 	return u.hyphenated()
 }
 
@@ -74,7 +74,7 @@ func (u UUID) digit() (string, error) {
 }
 
 // Digit returns a 32 bytes UUID
-func (u UUID) Digit(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
+func (u UUID) Digit(v reflect.Value, ctx *Context) (interface{}, error) {
 	return u.digit()
 }
 

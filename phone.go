@@ -29,9 +29,9 @@ func SetPhoner(p Phoner) {
 
 // Phoner serves overall tele-phonic contact generator
 type Phoner interface {
-	PhoneNumber(v reflect.Value, sf *reflect.StructField) (interface{}, error)
-	TollFreePhoneNumber(v reflect.Value, sf *reflect.StructField) (interface{}, error)
-	E164PhoneNumber(v reflect.Value, sf *reflect.StructField) (interface{}, error)
+	PhoneNumber(v reflect.Value, ctx *Context) (interface{}, error)
+	TollFreePhoneNumber(v reflect.Value, ctx *Context) (interface{}, error)
+	E164PhoneNumber(v reflect.Value, ctx *Context) (interface{}, error)
 }
 
 // Phone struct
@@ -45,7 +45,7 @@ func (p Phone) phonenumber() string {
 }
 
 // PhoneNumber generates phone numbers of type: "201-886-0269"
-func (p Phone) PhoneNumber(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
+func (p Phone) PhoneNumber(v reflect.Value, ctx *Context) (interface{}, error) {
 	return p.phonenumber(), nil
 }
 
@@ -70,7 +70,7 @@ func (p Phone) tollfreephonenumber() string {
 }
 
 // TollFreePhoneNumber generates phone numbers of type: "(888) 937-7238"
-func (p Phone) TollFreePhoneNumber(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
+func (p Phone) TollFreePhoneNumber(v reflect.Value, ctx *Context) (interface{}, error) {
 	return p.tollfreephonenumber(), nil
 }
 
@@ -92,7 +92,7 @@ func (p Phone) e164PhoneNumber() string {
 }
 
 // E164PhoneNumber generates phone numbers of type: "+27113456789"
-func (p Phone) E164PhoneNumber(v reflect.Value, sf *reflect.StructField) (interface{}, error) {
+func (p Phone) E164PhoneNumber(v reflect.Value, ctx *Context) (interface{}, error) {
 	return p.e164PhoneNumber(), nil
 }
 
