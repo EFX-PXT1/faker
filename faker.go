@@ -139,7 +139,15 @@ var defaultTag = map[string]string{
 type Context struct {
 	Uuid    string
 	Sf      *reflect.StructField
+	Fields  map[string]string      // we are just using strings 
 	Storage interface{}
+}
+
+// newContext creates a default context
+func newContext() *Context {
+	fields := make(map[string]string)
+	c := Context{uuid.Must(uuid.NewV4()).String(), nil, fields, nil}
+	return &c
 }
 
 // TaggedFunction used as the standard layout function for tag providers in struct.
@@ -266,7 +274,7 @@ func FakeData(a interface{}) error {
 
 	rval := reflect.ValueOf(a)
 
-	finalValue, err := getValue(a, &Context{uuid.Must(uuid.NewV4()).String(), nil, nil})
+	finalValue, err := getValue(a, newContext())
 	if err != nil {
 		return err
 	}
@@ -336,7 +344,7 @@ func getValue(a interface{}, ctx *Context) (reflect.Value, error) {
 	k := t.Kind()
 
 	if ctx == nil {
-		ctx = &Context{uuid.Must(uuid.NewV4()).String(), nil, nil}
+		ctx = newContext()
 	}
 
 	switch k {
@@ -370,6 +378,7 @@ func getValue(a interface{}, ctx *Context) (reflect.Value, error) {
 					continue // to avoid panic to set on unexported field in struct
 				}
 				tags := decodeTags(t, i)
+				name := t.Field(i).Name
 
 				switch {
 				case tags.keepOriginal:
@@ -383,6 +392,7 @@ func getValue(a interface{}, ctx *Context) (reflect.Value, error) {
 						if err != nil {
 							return reflect.Value{}, err
 						}
+						ctx.Fields[name] = v.Field(i).String()
 						continue
 					}
 					v.Field(i).Set(reflect.ValueOf(a).Field(i))
@@ -401,6 +411,7 @@ func getValue(a interface{}, ctx *Context) (reflect.Value, error) {
 					if err != nil {
 						return reflect.Value{}, err
 					}
+					ctx.Fields[name] = v.Field(i).String()
 				}
 
 			}
