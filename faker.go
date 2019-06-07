@@ -135,18 +135,27 @@ var defaultTag = map[string]string{
 	HyphenatedID:          HyphenatedID,
 }
 
+type GeneralStorage = map[string]interface{}
+
 // Context is supplied to TaggedFunction to extend the scope of context information
 type Context struct {
 	Uuid    string
 	Sf      *reflect.StructField
 	Fields  map[string]string      // we are just using strings 
-	Storage interface{}
+	Storage GeneralStorage         // general storage
 }
 
-// newContext creates a default context
-func newContext() *Context {
+// NewContext creates a default context
+func NewContext() *Context {
+	return NewContextWithStorage(nil)
+}
+
+func NewContextWithStorage(storage GeneralStorage) *Context {
 	fields := make(map[string]string)
-	c := Context{uuid.Must(uuid.NewV4()).String(), nil, fields, nil}
+	if storage == nil {
+		storage = make(GeneralStorage)
+	}
+	c := Context{uuid.Must(uuid.NewV4()).String(), nil, fields, storage}
 	return &c
 }
 
@@ -261,6 +270,10 @@ func SetRandomNumberBoundaries(start, end int) error {
 // FakeData is the main function. Will generate a fake data based on your struct.  You can use this for automation testing, or anything that need automated data.
 // You don't need to Create your own data for your testing.
 func FakeData(a interface{}) error {
+	return FakeDataWithStorage(a, nil)
+}
+
+func FakeDataWithStorage(a interface{}, gs GeneralStorage) error {
 
 	reflectType := reflect.TypeOf(a)
 
@@ -274,7 +287,7 @@ func FakeData(a interface{}) error {
 
 	rval := reflect.ValueOf(a)
 
-	finalValue, err := getValue(a, newContext())
+	finalValue, err := getValue(a, NewContextWithStorage(gs))
 	if err != nil {
 		return err
 	}
@@ -344,7 +357,7 @@ func getValue(a interface{}, ctx *Context) (reflect.Value, error) {
 	k := t.Kind()
 
 	if ctx == nil {
-		ctx = newContext()
+		ctx = NewContext()
 	}
 
 	switch k {
